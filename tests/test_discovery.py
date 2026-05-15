@@ -1,7 +1,7 @@
 """Test script discovery."""
 from pathlib import Path
 
-from anu_architecture.discovery import discover_scripts, discover_all
+from anu_architecture.discovery import discover_all, discover_scripts
 
 
 def _make_proj(tmp_path: Path) -> Path:

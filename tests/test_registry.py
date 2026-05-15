@@ -1,5 +1,4 @@
 """Test project_registry.json validation."""
-import json
 
 from anu_architecture.registry import validate_registry
 

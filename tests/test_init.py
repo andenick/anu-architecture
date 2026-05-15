@@ -1,5 +1,4 @@
 """Test anu-architecture init."""
-from pathlib import Path
 
 from typer.testing import CliRunner
 

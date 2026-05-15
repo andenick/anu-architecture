@@ -6,12 +6,12 @@ from pathlib import Path
 import typer
 
 from . import __version__
-from .init import init_project
-from .status import report_status
-from .run import run_pipeline
-from .checklist import render_checklist
 from .audit import run_audit
-from .version_cmd import version_up, version_log, version_archive
+from .checklist import render_checklist
+from .init import init_project
+from .run import run_pipeline
+from .status import report_status
+from .version_cmd import version_archive, version_log, version_up
 
 app = typer.Typer(
     name="anu-architecture",

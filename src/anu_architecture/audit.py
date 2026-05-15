@@ -1,4 +1,4 @@
-"""Public-reproducibility audit — anu-architecture audit.
+r"""Public-reproducibility audit — anu-architecture audit.
 
 Scans the project tree for:
     FAIL  - Hardcoded local paths (D:\, /Users/, C:\)
@@ -49,8 +49,8 @@ def run_audit(project: Path, strict: bool = False) -> int:
         if phase_dir in DATA_CONSTRUCTION_PHASES:
             for m in RANDOM_RE.finditer(text):
                 line_no = text[:m.start()].count("\n") + 1
-                findings.append(("FAIL", rel,
-                                f"L{line_no}: random call in data-construction phase: {m.group(0)}"))
+                msg = f"L{line_no}: random call in data-construction phase: {m.group(0)}"
+                findings.append(("FAIL", rel, msg))
                 break
 
         # WARN: L## without Public Source
@@ -65,8 +65,9 @@ def run_audit(project: Path, strict: bool = False) -> int:
             for did, d in reg.get("datasets", {}).items():
                 for cid, c in (d.get("columns") or {}).items():
                     if isinstance(c, dict) and c.get("proxy") and not c.get("proxy_justification"):
-                        findings.append(("WARN", "project_registry.json",
-                                        f"datasets.{did}.columns.{cid}: proxy=true without proxy_justification"))
+                        msg = (f"datasets.{did}.columns.{cid}: proxy=true "
+                               f"without proxy_justification")
+                        findings.append(("WARN", "project_registry.json", msg))
         except Exception as e:
             findings.append(("WARN", "project_registry.json", f"could not parse: {e}"))
 

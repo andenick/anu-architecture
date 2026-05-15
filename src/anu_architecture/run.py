@@ -9,7 +9,7 @@ from pathlib import Path
 
 import typer
 
-from .discovery import discover_all, discover_scripts
+from .discovery import discover_all
 
 
 def run_pipeline(

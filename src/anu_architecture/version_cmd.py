@@ -17,7 +17,7 @@ def version_up(project: Path, force: bool = False) -> int:
 
     existing = sorted([d for d in archive_root.iterdir()
                       if d.is_dir() and d.name.startswith("v")])
-    next_version = f"v0.1" if not existing else _bump(existing[-1].name)
+    next_version = "v0.1" if not existing else _bump(existing[-1].name)
     date = datetime.now().strftime("%Y-%m-%d")
     target = archive_root / f"{next_version}_{date}"
 
