@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/andenick/anu-architecture/schemas/project_registry.schema.json",
+  "title": "Anu Architecture Project Registry",
+  "type": "object",
+  "required": ["version", "project", "architecture", "studies", "datasets"],
+  "properties": {
+    "version": {"type": "string"},
+    "project": {"type": "string"},
+    "architecture": {"type": "string", "pattern": "^Anu Architecture "},
+    "language": {"type": "string", "enum": ["Python", "R", "Stata", "Mixed"]},
+    "author": {"type": "string"},
+    "studies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "status"],
+        "properties": {
+          "name": {"type": "string"},
+          "method": {"type": "string"},
+          "dependent_variable": {"type": "string"},
+          "key_prediction": {"type": "string"},
+          "analysis_scripts": {"type": "array", "items": {"type": "string"}},
+          "status": {
+            "type": "string",
+            "pattern": "^(PENDING|IN_PROGRESS|COMPLETE|BLOCKED:.*|DATA_UNAVAILABLE)$"
+          }
+        }
+      }
+    },
+    "datasets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description"],
+        "properties": {
+          "description": {"type": "string"},
+          "loading_scripts": {"type": "array", "items": {"type": "string"}},
+          "processing_scripts": {"type": "array", "items": {"type": "string"}},
+          "format": {"type": "string"},
+          "columns": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "proxy": {"type": "boolean"},
+                "proxy_justification": {"type": "string"}
+              },
+              "if": {"properties": {"proxy": {"const": true}}},
+              "then": {"required": ["proxy_justification"]}
+            }
+          }
+        }
+      }
+    }
+  }
+}

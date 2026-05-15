@@ -1,0 +1,18 @@
+"""M00: Run all M## scripts in numeric order."""
+import subprocess
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).parent
+scripts = sorted([p for p in HERE.iterdir()
+                  if p.name.startswith("M")
+                  and p.suffix == ".py"
+                  and p.name != "M00_run_all.py"
+                  and p.name[1:3].isdigit()],
+                 key=lambda p: int(p.name[1:3]))
+
+for s in scripts:
+    print(f"  M## {s.name}")
+    r = subprocess.run([sys.executable, str(s)])
+    if r.returncode != 0:
+        sys.exit(r.returncode)

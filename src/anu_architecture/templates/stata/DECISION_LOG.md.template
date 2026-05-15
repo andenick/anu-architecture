@@ -1,0 +1,23 @@
+# DECISION_LOG — {{ project_name }}
+
+Structured record of every design decision. Append-only.
+
+## Format
+
+```
+## DEC-001: <title> (YYYY-MM-DD)
+
+**Decision**: What was decided.
+
+**Rationale**: Why this choice was made.
+
+**Alternatives Considered**:
+- Alternative 1 (rejected: reason)
+- Alternative 2 (rejected: reason)
+
+**Impact**: What this decision affects going forward.
+```
+
+---
+
+(no decisions logged yet)

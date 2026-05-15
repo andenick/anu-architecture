@@ -1,0 +1,26 @@
+# CHECKLIST — {{ project_name }}
+
+Auto-generated from `project_registry.json`. Check items off as you complete them.
+
+## Pre-Analysis
+
+- [ ] S## scripts: environment ready, API keys validated
+- [ ] L## scripts: all data sources loading
+{% for src in sources -%}
+  - [ ] L{{ '%02d' % loop.index }}: load `{{ src }}` — Public Source URL documented
+{% endfor -%}
+- [ ] P## scripts: panels constructed, units validated
+- [ ] V## scripts (pre-analysis): data quality PASS
+- [ ] M## scripts: any adjustments documented with five-field audit
+
+## Analysis
+
+{% for s in studies -%}
+- [ ] {{ s }}: A## estimated, diagnostics pass
+{% endfor %}
+
+## Outputs
+
+- [ ] O## scripts: tables + figures + reports generated
+- [ ] All deliverables in `outputs/deliverables/`
+- [ ] `anu-architecture audit` returns CLEAN
