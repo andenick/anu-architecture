@@ -1,0 +1,25 @@
+{
+  "version": "2.1.0",
+  "project": "Python Minimal Example",
+  "architecture": "Anu Architecture v2.1",
+  "language": "Python",
+  "author": "Anu Architecture contributors",
+  "studies": {
+    "STUDY_01": {
+      "name": "FRED INDPRO summary",
+      "method": "Descriptive",
+      "dependent_variable": "indpro",
+      "key_prediction": "Long-run growth ~ 3% per year",
+      "analysis_scripts": ["A01"],
+      "status": "COMPLETE"
+    }
+  },
+  "datasets": {
+    "indpro": {
+      "description": "Industrial Production Index from FRED",
+      "loading_scripts": ["L01"],
+      "processing_scripts": ["P01"],
+      "format": "csv"
+    }
+  }
+}

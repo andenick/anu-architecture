@@ -1,0 +1,7 @@
+* Master orchestrator for {{ project_name }}
+* Iterate phase directories and run scripts in order.
+foreach phase in S L P V M A O {
+    local dir = cond("`phase'"=="S","setup",cond("`phase'"=="L","loading","..."))
+    local files : dir "code/`dir'" files "`phase'*.do"
+    foreach f of local files { do "code/`dir'/`f'" }
+}

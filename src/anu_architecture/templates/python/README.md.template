@@ -1,0 +1,41 @@
+# {{ project_name }}
+
+Anu Architecture project ({{ language }}).
+
+## Quick start
+
+1. Set API keys: copy `config/api_keys.env.example` to `config/api_keys.env`
+   and fill in your keys.
+2. Run the pipeline:
+
+   ```bash
+   {% if language == "R" -%}
+   Rscript run.R --dry-run
+   Rscript run.R
+   {%- else -%}
+   python run.py --dry-run
+   python run.py
+   {%- endif %}
+   ```
+
+3. Check status:
+
+   ```bash
+   anu-architecture status
+   ```
+
+## Studies
+
+{% for s in studies -%}
+- **{{ s }}**: TODO
+{% endfor %}
+
+## Data sources
+
+{% for src in sources -%}
+- **{{ src }}**: TODO (public URL)
+{% endfor %}
+
+## License
+
+TODO

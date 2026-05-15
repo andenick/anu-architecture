@@ -1,0 +1,27 @@
+{
+  "version": "2.1.0",
+  "project": "{{ project_name }}",
+  "architecture": "Anu Architecture v2.1",
+  "language": "{{ language }}",
+  "author": "TODO",
+
+  "studies": {
+{% for s in studies %}    "{{ s }}": {
+      "name": "TODO",
+      "method": "TODO",
+      "dependent_variable": "TODO",
+      "key_prediction": "TODO",
+      "analysis_scripts": ["A{{ '%02d' % loop.index }}"],
+      "status": "PENDING"
+    }{% if not loop.last %},{% endif %}
+{% endfor %}  },
+
+  "datasets": {
+{% for src in sources %}    "{{ src }}_data": {
+      "description": "TODO — from {{ src }}",
+      "loading_scripts": ["L{{ '%02d' % loop.index }}"],
+      "processing_scripts": [],
+      "format": "parquet"
+    }{% if not loop.last %},{% endif %}
+{% endfor %}  }
+}

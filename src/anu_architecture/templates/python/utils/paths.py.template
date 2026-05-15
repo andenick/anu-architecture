@@ -1,0 +1,31 @@
+"""Centralized path constants for {{ project_name }}.
+
+Every script imports paths from here. Never hardcode paths elsewhere.
+"""
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+
+# Code
+CODE = ROOT / "code"
+
+# Data
+DATA = ROOT / "data"
+USER_INPUTS = DATA / "user-inputs"
+RAW_DATA = DATA / "raw-data"
+INT_DATA = DATA / "int-data"
+FINAL_DATA = DATA / "final-data"
+ADJUSTED_FINAL_DATA = DATA / "adjusted-final-data"
+SCRATCH = DATA / "scratch"
+
+# Outputs
+OUTPUTS = ROOT / "outputs"
+VALIDATION_OUT = OUTPUTS / "validation"
+ANALYSIS_OUT = OUTPUTS / "analysis"
+DELIVERABLES = OUTPUTS / "deliverables"
+
+# Logs
+LOGS = ROOT / "logs"
+
+# Config
+CONFIG = ROOT / "config"
