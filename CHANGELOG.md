@@ -10,6 +10,8 @@ Initial standalone release. Extracted from the Anu Framework v11.0
 - Templates for Python, R, and Stata projects
 - `project_registry.json` JSON Schema
 - Tests on Python 3.10, 3.11, 3.12
+- Install: source only (`git clone` + `pip install -e .`); PyPI publication
+  deferred
 
 ## Lineage
 
