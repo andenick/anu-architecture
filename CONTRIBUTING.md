@@ -33,4 +33,6 @@ ruff check
 
 ## Release process
 
-Maintainers only. Tag `vX.Y.Z` on `main`; GitHub Actions publishes to PyPI.
+Maintainers only. Tag `vX.Y.Z` on `main` and create a GitHub Release.
+The package is not currently published to PyPI; users install from
+source (`git clone` + `pip install -e .`).

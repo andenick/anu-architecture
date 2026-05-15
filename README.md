@@ -10,17 +10,16 @@ script, dataset, output, and decision is tracked in one folder.
 
 ## Install
 
-```bash
-pip install anu-architecture
-```
-
-Or from source:
+Install from source (the package is not yet on PyPI):
 
 ```bash
 git clone https://github.com/andenick/anu-architecture
 cd anu-architecture
 pip install -e .
 ```
+
+This makes the `anu-architecture` CLI available globally and lets you pull
+updates with `git pull`.
 
 ## Quick start
 

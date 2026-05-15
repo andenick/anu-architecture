@@ -16,10 +16,9 @@ def discover_scripts(project: Path, phase: str,
                      include_orchestrator: bool = False) -> list[Path]:
     """Return scripts for one phase, sorted by number.
 
-    By default skips the `XX00_run_all` orchestrator file. The master `run.py`
-    invokes XX00 once per phase; XX00 internally iterates XX01-XX99. Pass
-    `include_orchestrator=True` to include XX00 (useful for the master
-    orchestrator itself).
+    By default skips the `XX00_run_all` orchestrator file. The master
+    `run.py` invokes XX00 once per phase; XX00 internally iterates
+    XX01-XX99.
     """
     phase_dir = project / "code" / PHASE_DIRS.get(phase, phase)
     if not phase_dir.exists():
