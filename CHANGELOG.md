@@ -2,7 +2,7 @@
 
 ## v2.1.0 — 2026-05-15
 
-Initial standalone release. Extracted from the Anu Framework v11.0
+Initial standalone release. Extracted from the Anu Framework v12.0
 `anu-architecture` skill.
 
 - 8-phase architecture (S/L/P/V/M/A/O/E) for econometric data construction
