@@ -1,0 +1,31 @@
+* Centralized path constants for {{ project_name }}.
+*
+* Every do-file starts with `do utils/paths.do`. Never hardcode paths
+* elsewhere. The master orchestrator (run.do) is executed from the project
+* root, so every global below is anchored to the working directory.
+
+global ROOT "`c(pwd)'"
+
+* Code
+global CODE "${ROOT}/code"
+
+* Data
+global DATA "${ROOT}/data"
+global USER_INPUTS "${DATA}/user-inputs"
+global RAW_DATA "${DATA}/raw-data"
+global INT_DATA "${DATA}/int-data"
+global FINAL_DATA "${DATA}/final-data"
+global ADJUSTED_FINAL_DATA "${DATA}/adjusted-final-data"
+global SCRATCH "${DATA}/scratch"
+
+* Outputs
+global OUTPUTS "${ROOT}/outputs"
+global VALIDATION_OUT "${OUTPUTS}/validation"
+global ANALYSIS_OUT "${OUTPUTS}/analysis"
+global DELIVERABLES "${OUTPUTS}/deliverables"
+
+* Logs
+global LOGS "${ROOT}/logs"
+
+* Config
+global CONFIG "${ROOT}/config"

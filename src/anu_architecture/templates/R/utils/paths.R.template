@@ -1,0 +1,31 @@
+# Centralized path constants for {{ project_name }}.
+#
+# Every script sources this file. Never hardcode paths elsewhere.
+# The master orchestrator (run.R) is executed from the project root, so
+# every constant below is anchored to the working directory.
+
+ROOT <- normalizePath(getwd(), winslash = "/", mustWork = FALSE)
+
+# Code
+CODE <- file.path(ROOT, "code")
+
+# Data
+DATA <- file.path(ROOT, "data")
+USER_INPUTS <- file.path(DATA, "user-inputs")
+RAW_DATA <- file.path(DATA, "raw-data")
+INT_DATA <- file.path(DATA, "int-data")
+FINAL_DATA <- file.path(DATA, "final-data")
+ADJUSTED_FINAL_DATA <- file.path(DATA, "adjusted-final-data")
+SCRATCH <- file.path(DATA, "scratch")
+
+# Outputs
+OUTPUTS <- file.path(ROOT, "outputs")
+VALIDATION_OUT <- file.path(OUTPUTS, "validation")
+ANALYSIS_OUT <- file.path(OUTPUTS, "analysis")
+DELIVERABLES <- file.path(OUTPUTS, "deliverables")
+
+# Logs
+LOGS <- file.path(ROOT, "logs")
+
+# Config
+CONFIG <- file.path(ROOT, "config")
