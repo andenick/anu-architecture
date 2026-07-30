@@ -51,3 +51,59 @@ def test_missing_public_source_warns_not_fails(tmp_path):
 
     rc_strict = run_audit(proj, strict=True)
     assert rc_strict == 1
+
+
+# --- proxy_justification negative control ---------------------------------
+
+def test_proxy_without_justification_warns_and_fails_strict(tmp_path):
+    """Negative control for the WARN branch: prove it can actually fire."""
+    proj = _make_proj(tmp_path)
+    (proj / "project_registry.json").write_text(
+        '''{"version": "2.1.0", "project": "test",
+            "architecture": "Anu Architecture v2.1",
+            "studies": {},
+            "datasets": {"panel": {"description": "p",
+                                   "columns": {"yield": {"proxy": true}}}}}''')
+    assert run_audit(proj) == 0            # WARN only
+    assert run_audit(proj, strict=True) == 1
+
+
+def test_proxy_with_justification_is_clean(tmp_path):
+    proj = _make_proj(tmp_path)
+    (proj / "project_registry.json").write_text(
+        '''{"version": "2.1.0", "project": "test",
+            "architecture": "Anu Architecture v2.1",
+            "studies": {},
+            "datasets": {"panel": {"description": "p",
+                                   "columns": {"yield": {"proxy": true,
+                                   "proxy_justification": "documented"}}}}}''')
+    assert run_audit(proj, strict=True) == 0
+
+
+# --- coverage: utils/ and the root orchestrator ---------------------------
+
+def test_hardcoded_path_in_utils_fails(tmp_path):
+    """utils/paths.* is the designated home of every path constant, so it is
+    the likeliest place a machine-local path hides. It must be in scope."""
+    proj = _make_proj(tmp_path)
+    (proj / "utils").mkdir()
+    (proj / "utils" / "paths.py").write_text('ROOT = "C:/Users/alice/project"\n')
+    assert run_audit(proj) == 1
+
+
+def test_hardcoded_path_in_root_orchestrator_fails(tmp_path):
+    proj = _make_proj(tmp_path)
+    (proj / "run.py").write_text('PROJECT = "/Users/alice/project"\n')
+    assert run_audit(proj) == 1
+
+
+def test_random_outside_data_construction_is_allowed(tmp_path):
+    """np.random is legitimate in analysis/ and in utils/ — only the five
+    data-construction phase folders are checked."""
+    proj = _make_proj(tmp_path)
+    (proj / "code" / "analysis" / "A01_bootstrap.py").write_text(
+        "import numpy as np\nx = np.random.rand(10)\n")
+    (proj / "utils").mkdir()
+    (proj / "utils" / "helpers.py").write_text(
+        "import numpy as np\nx = np.random.rand(10)\n")
+    assert run_audit(proj, strict=True) == 0

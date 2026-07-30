@@ -68,4 +68,28 @@ __pycache__/
 - `np.random` in data construction scripts (S/L/P/V/M paths)
 - Missing proxy justifications when `"proxy": true`
 
-Run it before every release. CI runs it on every PR.
+### What it covers, exactly
+
+The gate is not a whole-repo scan. Stating its coverage is part of the
+contract, so you know what it does *not* protect you from:
+
+| Scanned | Not scanned |
+|---|---|
+| `code/**` (`.py`, `.R`, `.do`) | `data/`, `outputs/`, `logs/` |
+| `utils/**` (`.py`, `.R`, `.do`) | `docs/`, `README.md`, notebooks |
+| the root orchestrator `run.py` / `run.R` / `run.do` | `config/` (never contains code) |
+| `project_registry.json` (proxy justifications) | anything outside the project folder |
+
+The `np.random` check is narrower still: it applies only to
+`code/{setup,loading,processing,validation,manual}`, because randomness in
+`analysis/` and `exploration/` is legitimate.
+
+Run it before every release:
+
+```bash
+anu-architecture audit --strict
+```
+
+This repository runs the gate against its own shipped example
+(`examples/python-minimal`) in the `test` workflow, so the gate itself is
+exercised on every push and pull request.

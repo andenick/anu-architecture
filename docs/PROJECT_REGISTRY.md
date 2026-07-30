@@ -35,7 +35,9 @@ the pipeline.
 }
 ```
 
-Full schema: [`schemas/project_registry.schema.json`](../schemas/project_registry.schema.json).
+Full schema: [`src/anu_architecture/schemas/project_registry.schema.json`](../src/anu_architecture/schemas/project_registry.schema.json)
+— the copy that ships in the package and that `anu-architecture` actually
+validates against.
 
 ## Proxy declarations
 

@@ -1,6 +1,21 @@
 """Test project_registry.json validation."""
+import json
+from pathlib import Path
+
+import pytest
 
 from anu_architecture.registry import validate_registry
+
+EXAMPLES = Path(__file__).resolve().parent.parent / "examples"
+
+
+@pytest.mark.parametrize("example", sorted(p.name for p in EXAMPLES.iterdir()
+                                           if (p / "project_registry.json").exists()))
+def test_shipped_example_registry_is_valid(example):
+    reg = json.loads((EXAMPLES / example / "project_registry.json")
+                     .read_text(encoding="utf-8"))
+    errors = validate_registry(reg)
+    assert not errors, errors
 
 
 def test_valid_registry():

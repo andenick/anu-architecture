@@ -21,3 +21,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e ".[dev]"
       - run: pytest -v
+      # Exercise the public-reproducibility gate on the shipped example,
+      # so the gate is proven to run (and to pass) on every push and PR.
+      - run: anu-architecture audit --project examples/python-minimal --strict

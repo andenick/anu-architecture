@@ -1,25 +1,47 @@
 {
   "version": "2.1.0",
-  "project": "R Minimal Example",
+  "project": "R Dissertation Example",
   "architecture": "Anu Architecture v2.1",
   "language": "R",
   "author": "Anu Architecture contributors",
   "studies": {
     "STUDY_01": {
-      "name": "FRED INDPRO summary",
-      "method": "Descriptive",
-      "dependent_variable": "indpro",
-      "key_prediction": "Long-run growth ~ 3% per year",
+      "name": "Mean reversion of firm profitability",
+      "method": "System GMM",
+      "dependent_variable": "roa",
+      "key_prediction": "AR(1) coefficient below 1 and stable across subperiods",
       "analysis_scripts": ["A01"],
-      "status": "COMPLETE"
+      "status": "PENDING"
+    },
+    "STUDY_02": {
+      "name": "Profit-rate equalization across sectors",
+      "method": "Panel cointegration",
+      "dependent_variable": "sector_profit_rate",
+      "key_prediction": "Sector rates are cointegrated with the economy-wide rate",
+      "analysis_scripts": ["A02"],
+      "status": "PENDING"
+    },
+    "STUDY_03": {
+      "name": "Interest-profit spread and investment",
+      "method": "Local projections",
+      "dependent_variable": "investment_growth",
+      "key_prediction": "Widening spread precedes slower investment growth",
+      "analysis_scripts": ["A03"],
+      "status": "PENDING"
     }
   },
   "datasets": {
-    "indpro": {
-      "description": "Industrial Production Index from FRED",
+    "firm_panel": {
+      "description": "Firm-year panel of profitability and balance-sheet items",
       "loading_scripts": ["L01"],
       "processing_scripts": ["P01"],
-      "format": "csv"
+      "format": "parquet"
+    },
+    "macro_series": {
+      "description": "Economy-wide interest rates, profit rates and investment",
+      "loading_scripts": ["L02"],
+      "processing_scripts": ["P02"],
+      "format": "parquet"
     }
   }
 }

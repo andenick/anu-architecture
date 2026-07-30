@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/andenick/anu-architecture/schemas/project_registry.schema.json",
+  "$id": "https://github.com/andenick/anu-architecture/src/anu_architecture/schemas/project_registry.schema.json",
   "title": "Anu Architecture Project Registry",
   "type": "object",
   "required": ["version", "project", "architecture", "studies", "datasets"],
