@@ -1,7 +1,29 @@
 * Master orchestrator for {{ project_name }}
-* Iterate phase directories and run scripts in order.
-foreach phase in S L P V M A O {
-    local dir = cond("`phase'"=="S","setup",cond("`phase'"=="L","loading","..."))
-    local files : dir "code/`dir'" files "`phase'*.do"
-    foreach f of local files { do "code/`dir'/`f'" }
+* Runs XX01-XX99 do-files by phase in canonical order:
+*   S -> L -> P -> V -> M -> A -> V (diagnostics) -> O (LAST)
+* V## appears twice by design (data quality, then model diagnostics).
+* The optional XX00_run_all.do in a phase folder is a standalone convenience
+* runner for that one phase; it is skipped here so nothing runs twice.
+*
+* NOTE: the project's CI does not include a Stata runner, so this
+* orchestrator is not exercised automatically. Run it once by hand
+* (stata -b do run.do) before relying on it.
+
+local phases "S L P V M A V O"
+local dirs   "setup loading processing validation manual analysis validation outputs"
+
+local n : word count `phases'
+forvalues i = 1/`n' {
+    local phase : word `i' of `phases'
+    local dir   : word `i' of `dirs'
+
+    local files : dir "code/`dir'" files "`phase'??_*.do"
+    local files : list sort files
+
+    foreach f of local files {
+        if ("`f'" != "`phase'00_run_all.do") {
+            display "`phase'  `f'"
+            do "code/`dir'/`f'"
+        }
+    }
 }

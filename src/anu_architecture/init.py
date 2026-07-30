@@ -130,8 +130,11 @@ def init_project(
             encoding="utf-8",
         )
 
+    next_cmd = {"python": "python run.py --dry-run",
+                "R": "Rscript run.R",
+                "stata": "stata -b do run.do"}[lang_dir]
     typer.echo(f"\n[anu-architecture] Scaffolded {name} at {location}")
     typer.echo(f"  Studies: {', '.join(studies)}")
     typer.echo(f"  Sources: {', '.join(sources)}")
-    typer.echo(f"\nNext: cd {location.name} && python run.py --dry-run")
+    typer.echo(f"\nNext: cd {location.name} && {next_cmd}")
     return location

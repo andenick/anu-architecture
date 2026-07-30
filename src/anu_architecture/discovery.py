@@ -16,9 +16,12 @@ def discover_scripts(project: Path, phase: str,
                      include_orchestrator: bool = False) -> list[Path]:
     """Return scripts for one phase, sorted by number.
 
-    By default skips the `XX00_run_all` orchestrator file. The master
-    `run.py` invokes XX00 once per phase; XX00 internally iterates
-    XX01-XX99.
+    XX01-XX99 are the unit of execution: the master orchestrator runs them
+    directly, in numeric order. The optional `XX00_run_all` per-phase
+    orchestrator is a standalone convenience runner for invoking one phase
+    by hand — it is excluded here (and by the generated `run.py`) so that
+    scripts are never executed twice. Pass ``include_orchestrator=True`` to
+    list it anyway.
     """
     phase_dir = project / "code" / PHASE_DIRS.get(phase, phase)
     if not phase_dir.exists():
@@ -31,11 +34,12 @@ def discover_scripts(project: Path, phase: str,
     return scripts
 
 
-def discover_all(project: Path, order: str = "SLPVMAOVO") -> list[tuple[str, Path]]:
+def discover_all(project: Path, order: str = "SLPVMAVO") -> list[tuple[str, Path]]:
     """Discover all scripts in canonical execution order.
 
-    Default order: S -> L -> P -> V -> M -> A -> V (diagnostics) -> O.
-    E## runs concurrently in normal use; not included here.
+    Default order: S -> L -> P -> V -> M -> A -> V (diagnostics) -> O (LAST).
+    V## appears twice by design (data quality, then model diagnostics); no
+    other phase does. E## runs concurrently in normal use; not included here.
     """
     out = []
     for ph in order:

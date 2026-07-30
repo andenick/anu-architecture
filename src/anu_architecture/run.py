@@ -25,7 +25,7 @@ def run_pipeline(
                    "(no project_registry.json)", err=True)
         return 1
 
-    order = "SLPVMAOVO"  # S -> L -> P -> V -> M -> A -> V(diag) -> O
+    order = "SLPVMAVO"  # S -> L -> P -> V -> M -> A -> V(diag) -> O (LAST)
     if validate_only:
         order = "V"
     elif from_phase:

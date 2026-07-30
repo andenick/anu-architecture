@@ -1,9 +1,17 @@
 # Master orchestrator for {{ project_name }}
-# Discovers L##/P##/V##/M##/A##/O## scripts and sources them in order.
-for (phase in strsplit('SLPVMAOVO', '')[[1]]) {
-  dir <- file.path('code', list('S'='setup','L'='loading','P'='processing',
-                                'V'='validation','M'='manual','A'='analysis',
-                                'O'='outputs','E'='exploration')[[phase]])
-  scripts <- sort(list.files(dir, pattern=paste0('^', phase, '[0-9]{2}_.*\\.R$'), full.names=TRUE))
+# Runs XX01-XX99 scripts by phase in canonical order:
+#   S -> L -> P -> V -> M -> A -> V (diagnostics) -> O (LAST)
+# V## appears twice by design (data quality, then model diagnostics).
+# The optional XX00_run_all.R in a phase folder is a standalone convenience
+# runner for that one phase; it is skipped here so nothing runs twice.
+PHASE_DIRS <- list('S' = 'setup', 'L' = 'loading', 'P' = 'processing',
+                   'V' = 'validation', 'M' = 'manual', 'A' = 'analysis',
+                   'O' = 'outputs', 'E' = 'exploration')
+
+for (phase in strsplit('SLPVMAVO', '')[[1]]) {
+  dir <- file.path('code', PHASE_DIRS[[phase]])
+  scripts <- sort(list.files(dir, pattern = paste0('^', phase, '[0-9]{2}_.*\\.R$'),
+                             full.names = TRUE))
+  scripts <- scripts[!startsWith(basename(scripts), paste0(phase, '00_'))]
   for (s in scripts) { cat(phase, basename(s), '\n'); source(s) }
 }

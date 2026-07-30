@@ -12,6 +12,8 @@ Anu Architecture project ({{ language }}).
    {% if language == "R" -%}
    Rscript run.R --dry-run
    Rscript run.R
+   {%- elif language == "Stata" -%}
+   stata -b do run.do
    {%- else -%}
    python run.py --dry-run
    python run.py
