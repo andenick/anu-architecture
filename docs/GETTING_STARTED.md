@@ -2,8 +2,12 @@
 
 ## 1. Install
 
+The package is not published on PyPI — install from source:
+
 ```bash
-pip install anu-architecture
+git clone https://github.com/andenick/anu-architecture
+cd anu-architecture
+pip install -e .
 ```
 
 Verify:
@@ -43,9 +47,10 @@ my-study/
 │   ├── analysis/     A##        # Estimation + robustness
 │   ├── outputs/      O##        # Final outputs (runs LAST)
 │   └── exploration/  E##        # Ephemeral exploration
+├── config/api_keys.env.example  # Placeholder keys + registration URLs
 ├── data/{user-inputs,raw-data,int-data,final-data,adjusted-final-data,scratch}/
 ├── outputs/{validation,analysis,exploration,deliverables}/
-├── utils/
+├── utils/paths.*                # Every path constant lives here
 ├── logs/
 ├── docs/
 └── .gitignore

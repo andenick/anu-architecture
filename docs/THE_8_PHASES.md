@@ -4,6 +4,11 @@ The Anu Architecture organizes every script into one of eight phases. The
 prefix declares the phase; the number declares execution order within the
 phase.
 
+> **This document is canonical for phase semantics.** README.md carries a
+> one-line summary table and `SPEC.md` carries the formal reads/writes
+> contract; when any of the three disagree about what a phase *means*,
+> this file wins and the others are corrected to match.
+
 ## S## — Setup
 
 **Purpose**: Package installation, environment config, API key validation,

@@ -4,7 +4,7 @@ Standardized 8-phase architecture for econometric data construction and
 analysis. Scaffolds a self-contained, language-agnostic project where every
 script, dataset, output, and decision is tracked in one folder.
 
-> Anu Architecture is one of 20 skills in the
+> Anu Architecture is a member skill of the
 > [Anu Framework](https://github.com/andenick/anu-framework). This repo
 > extracts it as an independent tool.
 
@@ -45,8 +45,9 @@ walkthrough.
 | **O##** | Output | Tables, figures, reports (runs LAST) |
 | **E##** | Explore | Standalone exploratory work (ephemeral) |
 
-Full spec: [`docs/SPEC.md`](docs/SPEC.md). The 8 phases in depth:
-[`docs/THE_8_PHASES.md`](docs/THE_8_PHASES.md).
+The table above is a summary. [`docs/THE_8_PHASES.md`](docs/THE_8_PHASES.md)
+is canonical for what each phase means; [`docs/SPEC.md`](docs/SPEC.md) is
+the full spec.
 
 ## Core principles
 
@@ -72,7 +73,7 @@ anu-architecture version up|log|archive      # Evolutionary versioning
 ## See also
 
 - [Anu Framework](https://github.com/andenick/anu-framework) — the full
-  20-skill data-construction framework. Use that if you need replication,
+  data-construction framework. Use that if you need replication,
   extension, three-channel distribution, etc.
 - [Anu Replicator](https://github.com/andenick/anu-framework/tree/main/skills/anu-replicator)
   — the sibling skill for replicating *published* data series (vs Anu

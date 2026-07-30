@@ -1,9 +1,9 @@
 # Anu Architecture — Specification
 
-> **Standalone version.** Anu Architecture is one of 20 skills in the
+> **Standalone version.** Anu Architecture is a member skill of the
 > [Anu Framework](https://github.com/andenick/anu-framework). This repo
-> extracts it as an independent, `pip install`-able tool for users who
-> want the 8-phase scaffold without adopting the full framework.
+> extracts it as an independent, installable tool for users who want the
+> 8-phase scaffold without adopting the full framework.
 
 ---
 
@@ -24,8 +24,8 @@ Anu Architecture is a standardized, self-contained architecture for bespoke econ
 5. **Audit Trail**: Every transformation, parameter choice, and model run is logged in structured JSON.
 6. **Exploration Preservation**: Exploratory work feeds `data/scratch/` (ephemeral); conclusions go to DECISION_LOG.md. E## scripts are never deleted — they are the permanent record of the research process.
 7. **No Synthetic Data**: Every value in every CSV must come from a real, documented source. If data is unavailable, the series is `data_unavailable` — never filled with trends, noise, or estimates. Missing data is a gap to be resolved, not a hole to be papered over. `np.random` in a data construction script is always wrong.
-8. **Public Reproducibility**: Every L## script must either call a public API or include a comment with the public download URL. No private data paths (Robin, internal databases) in the pipeline. If data comes from a non-API source, the L## header must include a `PUBLIC SOURCE:` line with the URL where anyone can obtain this data. Learned from the reference project: had to retroactively strip all private data references from 40+ scripts.
-9. **Source Specification Before Code**: Before writing any L## or P## script, produce a Source Specification listing: variable name, source agency, table/series ID, units, frequency, URL, and date range. This is the contract the code must fulfill. Learned from the reference project: building extensions first then checking the Knowledge Base produced a 21% error rate.
+8. **Public Reproducibility**: Every L## script must either call a public API or include a comment with the public download URL. No private or machine-local data paths in the pipeline. If data comes from a non-API source, the L## header must include a `PUBLIC SOURCE:` line with the URL where anyone can obtain this data. Retrofitting this onto a finished project is far more expensive than doing it from the first script.
+9. **Source Specification Before Code**: Before writing any L## or P## script, produce a Source Specification listing: variable name, source agency, table/series ID, units, frequency, URL, and date range. This is the contract the code must fulfill. Writing the code first and checking it against the source documentation afterwards reliably produces silent concept mismatches — in one unpublished internal pilot, roughly a fifth of the constructed series were affected. Treat that proportion as indicative of the failure mode, not as a measured benchmark: it comes from a single project and is not independently auditable.
 10. **No Proxies Without Justification**: If the exact source is unavailable, document why and what proxy is used. Proxies must be flagged in project_registry.json with `"proxy": true` and a justification. CPI is not PPI. Earnings is not compensation. Yield is not total return. Every concept substitution degrades faithfulness.
 
 ## When to Use
@@ -43,7 +43,7 @@ Anu Architecture is a **first-class skill within the Anu Framework**, complement
 
 | | Anu Replicator | Anu Architecture |
 |---|---|---|
-| **Purpose** | Replicate published data series (e.g., Shaikh 2016 appendices) | Original econometric research and empirical analysis |
+| **Purpose** | Replicate published data series (e.g., the statistical appendices of a published book) | Original econometric research and empirical analysis |
 | **Phases** | L## + P## + V## + M## (4 phases) | S## + L## + P## + V## + M## + A## + O## + E## (8 phases) |
 | **Central config** | `series_registry.json` | `project_registry.json` |
 | **Language** | Python only | Any (R, Python, Stata, Mixed — user-configured) |
@@ -54,7 +54,7 @@ Anu Architecture is a **first-class skill within the Anu Framework**, complement
 A project can have **both** `Technical/ANU_REPLICATOR/` and `Technical/AnuArchitecture/`. They share the L##/P## naming convention and auto-discovery pattern but serve different purposes.
 
 Anu Architecture **borrows** from Anu Replicator:
-- L##/P## naming and glob-based auto-discovery (XX00 orchestrators)
+- L##/P## naming and glob-based script auto-discovery
 - `paths.R`/`paths.py` centralized path management
 - LOAD_LOG.json / PROCESS_LOG.json audit trails
 - Result dict pattern (status, outputs, validation)
@@ -76,6 +76,10 @@ Projects scaffolded before the May 2026 rename used `Technical/AnuData/` rather 
 ---
 
 ## The Eight Prefixes
+
+The table below is the reads/writes contract. For what each phase *means*
+— and what belongs in it versus the phase next door — [`THE_8_PHASES.md`](THE_8_PHASES.md)
+is canonical.
 
 | Prefix | Name | Purpose | Reads From | Writes To |
 |--------|------|---------|------------|-----------|
@@ -105,11 +109,11 @@ S## -> L## -> P## (+ E## runs concurrently) -> V## -> M## -> A## -> V## (diagnos
 
 ## Script Conventions
 
-- **XX00**: Orchestrator script — auto-discovers and runs XX01-XX99 via glob pattern `XX[0-9][0-9]_*.ext`
-- **XX01-XX99**: Individual scripts, numbered to reflect execution order
+- **XX01-XX99**: Individual scripts, numbered to reflect execution order. **These are the unit of execution** — the master orchestrator discovers and runs them directly, in numeric order.
+- **XX00**: *Optional* per-phase convenience runner. It runs XX01-XX99 for its own phase only, so you can execute one phase by hand (`python code/loading/L00_run_all.py`). The master orchestrator **skips XX00** — if it did not, every script would run twice. XX00 files are scaffolded for Python projects; R and Stata scaffolds rely on the master orchestrator alone.
 - **Numbers mean execution order, nothing else.** No reserved ranges, no semantic sub-bands. If you need to insert between XX03 and XX04, renumber the phase and follow the Renumbering Protocol below.
 - Every script must include a standard header block declaring Purpose, Inputs, Outputs, and Dependencies (see Script Header Standard below).
-- Naming pattern: `XX##_descriptive_name.ext` (e.g., `L01_load_robin_failing_banks.py`)
+- Naming pattern: `XX##_descriptive_name.ext` (e.g., `L01_load_fred_indpro.py`)
 - File extension determined by project language config (`.R`, `.py`, `.do`, `.jl`)
 - **Letter suffixes (A01b, P03b) are NOT allowed** — they are invisible to the orchestrator glob and break pipeline discovery. Renumber instead.
 - **Only the 8 defined phase prefixes are valid**: S, L, P, V, M, A, O, E. Do not invent new prefixes (e.g., no "N##" for robustness — use A## instead).
@@ -160,41 +164,39 @@ When inserting, removing, or reordering scripts within a phase, complete ALL ste
 
 ---
 
-## `/anu-architecture init` — Interactive Setup
+## `anu-architecture init` — Interactive Setup
 
-When invoked, the skill interactively prompts the user for project configuration. **Language is NOT hardcoded** — the skill asks the user to specify their preferred language(s) for each new project.
+`anu-architecture init` prompts for project configuration on the command line. **Language is NOT hardcoded** — you specify the preferred language for each new project. Pass `--yes` to skip the prompts and take the defaults.
 
 ### Interactive Prompts
 
 ```
-/anu-architecture init
+$ anu-architecture init
 
 > Project name?
 > Language? [R / Python / Stata / Mixed]
-> Location? [Technical/AnuArchitecture] (default)
+> Location? [./<project name>] (default)
 > How many studies/tests?
 > Study names? (comma-separated)
 > Data sources? (comma-separated)
-> Include Shiny visualization? [y/N]
-> Include automated tests? [y/N]
 ```
 
-Use `AskUserQuestion` for each prompt to collect user input.
-
-### What `/anu-architecture init` Creates
+### What `anu-architecture init` Creates
 
 1. **Full folder structure** (see Folder Structure below)
 2. **Master orchestrator** (`run.R`, `run.py`, or `run.do` per language choice)
 3. **`project_registry.json`** with study stubs from user input
-4. **All XX00 orchestrator scripts** (S00, L00, P00, V00, M00, A00, O00)
-5. **`utils/paths.R`** (or `.py`) with all path constants
+4. **`utils/paths.py`** / **`paths.R`** / **`paths.do`** with all path constants
+5. **`config/api_keys.env.example`** with placeholder keys and free-registration URLs
 6. **`README.md`** with project overview and running instructions
 7. **`DECISION_LOG.md`** (empty template with format guide)
 8. **`CHECKLIST.md`** (auto-populated from study configuration)
-9. **`docs/` templates**: METHODOLOGY.md, DATA_SOURCES.md, VARIABLE_CODEBOOK.md, ASSUMPTIONS.md
-10. **L## stubs** for each data source specified
-11. **A## stubs** for each study specified
-12. **`.gitignore`** (ignore data/raw-data/, data/int-data/, data/scratch/, logs/)
+9. **L## stubs** for each data source specified
+10. **A## stubs** for each study specified
+11. **`.gitignore`** (ignore config/api_keys.env, data/raw-data/api/, data/scratch/, logs/runs/)
+12. **XX00 per-phase orchestrators** — Python scaffolds only; they are optional (see Script Conventions)
+
+An empty `docs/` folder is created for study documentation; the METHODOLOGY / DATA_SOURCES / VARIABLE_CODEBOOK / ASSUMPTIONS documents described below are conventions you fill in, not files `init` writes.
 
 ---
 
@@ -366,7 +368,7 @@ Structured entries recording every design decision:
 
 ## CHECKLIST.md
 
-Auto-generated by `/anu-architecture init`, populated from the study configuration. Covers:
+Auto-generated by `anu-architecture init`, populated from the study configuration. Covers:
 
 - **Pre-Analysis**: All S##, L##, P##, V## items checked
 - **Analysis**: All A## studies estimated, diagnostics pass
@@ -399,7 +401,7 @@ Rscript run.R --dry-run          # Show what would execute
 Rscript run.R --report           # Status report from last run
 ```
 
-Each XX00 orchestrator auto-discovers scripts by glob pattern (e.g., `list.files("code/loading", pattern = "^L[0-9]{2}_.*\\.R$")`) and sources them in numeric order.
+The master orchestrator auto-discovers scripts by glob pattern (e.g., `list.files("code/loading", pattern = "^L[0-9]{2}_.*\\.R$")`) and runs them in numeric order, excluding the optional XX00 per-phase runners so that nothing executes twice.
 
 ---
 
@@ -412,7 +414,7 @@ Each XX00 orchestrator auto-discovers scripts by glob pattern (e.g., `list.files
 
 ---
 
-## `/anu-architecture status`
+## `anu-architecture status`
 
 Check current state of an Anu Architecture project:
 - Read `project_registry.json` for study definitions
@@ -424,7 +426,7 @@ Check current state of an Anu Architecture project:
 
 ---
 
-## `/anu-architecture checklist`
+## `anu-architecture checklist`
 
 Display the current CHECKLIST.md with completion status. Useful for agents picking up where a previous session left off.
 
@@ -562,13 +564,13 @@ Technical/AnuArchitecture/
 
 ---
 
-## `/anu-architecture version [up|log|archive]`
+## `anu-architecture version [up|log|archive]`
 
 Additional commands for evolutionary projects:
 
-- **`/anu-architecture version up`**: Archive current state, increment version, update VERSION_LOG.md
-- **`/anu-architecture version log`**: Display VERSION_LOG.md showing evolution history
-- **`/anu-architecture version archive`**: List all archived versions with dates and descriptions
+- **`anu-architecture version up`**: Archive current state, increment version, update VERSION_LOG.md
+- **`anu-architecture version log`**: Display VERSION_LOG.md showing evolution history
+- **`anu-architecture version archive`**: List all archived versions with dates and descriptions
 
 ---
 
@@ -591,45 +593,13 @@ Every assumption should be revisited when versioning up.
 
 ---
 
-## Skill Evolution Log
-
-This section tracks learnings from real-world usage of Anu Architecture to improve the architecture.
-
-### Learning L001 (2026-04-05, Applied Research Project Planning)
-
-**Context**: First real-world application (as NickyData v1.0) to an applied research project.
-
-**Findings**:
-1. The original skill lacked evolutionary versioning — critical for long-running research projects. Added snake-shedding model.
-2. The original skill lacked an assumptions register — critical for research projects where every claim must be defensible. Added ASSUMPTIONS.md.
-3. The 8-phase pipeline maps well to the research workflow, but V## needs to be explicitly split into "data quality" (pre-analysis) and "model diagnostics" (post-analysis) passes.
-4. E## exploration scripts are invaluable for building intuition before formal estimation. The "never delete" rule is essential.
-5. Source attribution must be a first-class concern — every decision, variable construction, and method choice needs a citation trail.
-6. The project_registry.json "studies" structure works well for organizing multiple tests within a single project.
-
-**Actions Taken**: Updated skill with evolutionary versioning, assumptions register, version commands.
-
-### Learning L002 (2026-05-09, Anu Framework Integration)
-
-**Context**: Renamed from NickyData to AnuData Architecture and integrated as a first-class Anu Framework skill.
-
-**Rationale**: NickyData was architecturally parallel to the Anu Framework but treated as a separate system. Integration makes the full data construction lifecycle — from replication (anu-replicator) through original research — a unified framework. This also positions the architecture for open-source release as a standalone adoptable framework.
-
-### Learning L003 (2026-05-15, Framework-Name Consistency)
-
-**Context**: Renamed from AnuData Architecture to Anu Architecture as part of the v11.0 framework sweep.
-
-**Rationale**: The "AnuData" name created a parallel brand inside the Anu Framework — readers had to learn two names ("Anu" and "AnuData") for what is in fact one unified system. The rename makes the skill's identity consistent with the rest of the framework (anu-*) and removes the impression that "Anu Architecture" is a sibling framework rather than a member skill. The skill folder `anu-data/` was renamed to `anu-architecture/`; the project-level folder default became `Technical/AnuArchitecture/`; existing projects with `Technical/AnuData/` are unaffected and remain valid.
-
----
-
 ## Canonical references
 
 - [the Anu Framework glossary](https://github.com/andenick/anu-framework/blob/main/docs/ANU_FRAMEWORK_GLOSSARY.md) — shared vocabulary for all framework terms.
 
 ---
 
-*Anu Architecture v2.1 — Part of the Anu Framework v12.0*
+*Anu Architecture v2.1 — Part of the Anu Framework v12.2*
 *Lineage: NickyData v1.0 (2026-04-05) -> NickyData v1.1 (2026-04-06) -> AnuData v2.0 (2026-05-09) -> Anu Architecture v2.1 (2026-05-15)*
 *Maintained as part of the Anu Framework*
 *First application: an applied research project (2026-04-05)*

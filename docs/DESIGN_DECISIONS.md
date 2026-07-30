@@ -56,11 +56,46 @@ Two reasons:
 2. The pipeline itself runs locally with `python run.py`. CI is just
    "run that on a fresh container" — and we can't predict the dependencies.
 
-`examples/python-minimal/.github/workflows/` shows a starting template.
+This repository's own [`.github/workflows/`](../.github/workflows/) is a
+usable starting template: a lint job and a test matrix, plus one step that
+runs `anu-architecture audit --strict` against the shipped example.
+
+## Why does the master orchestrator skip `XX00_run_all`?
+
+Because there are two plausible units of execution and only one can be
+correct. Either the orchestrator runs the eight `XX00` per-phase runners
+and each of those runs its own `XX01-XX99`, or the orchestrator runs
+`XX01-XX99` directly. Doing both runs every script twice — loaders
+re-download, `M##` adjustments re-apply.
+
+`XX01-XX99` is the unit of execution. `XX00` is a convenience runner for
+executing one phase by hand, and every orchestrator filters it out.
+
+## Why does `V##` appear twice in the phase order but nothing else does?
+
+The canonical order is `S -> L -> P -> V -> M -> A -> V -> O`. Validation
+is genuinely two different jobs: data quality before analysis, and model
+diagnostics after estimation. Every other phase — `O##` above all — runs
+exactly once, and `O##` runs last so that everything it renders already
+exists.
 
 ## Why "snake-shedding" evolutionary versioning?
 
-Long-running projects (dissertations, multi-year studies) accumulate
+Long-running projects (multi-year studies with many revisions) accumulate
 decisions, data updates, methodological shifts. Snake-shedding archives
 each version intact rather than rewriting history. The `_archive/` is the
 permanent record.
+
+This and the assumptions register were both added after the first
+real-world use of the architecture, which surfaced the same gap twice: a
+long project cannot defend a result if the state that produced it has been
+overwritten, and it cannot defend a method if the assumptions behind it
+were never written down.
+
+## Why an `ASSUMPTIONS.md` register?
+
+In research code, the assumptions are the part most likely to be
+challenged and least likely to be recorded. Giving them a file, an ID
+scheme (`ASM-D01`, `ASM-M01`, `ASM-T01`) and a source citation makes them
+reviewable — and makes "revisit every assumption" a concrete step when
+versioning up rather than an intention.
