@@ -6,6 +6,8 @@ from pathlib import Path
 import typer
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from . import __version__
+
 TEMPLATE_ROOT = Path(__file__).parent / "templates"
 
 
@@ -14,6 +16,21 @@ PHASES = ["setup", "loading", "processing", "validation",
 PHASE_PREFIXES = {"setup": "S", "loading": "L", "processing": "P",
                   "validation": "V", "manual": "M", "analysis": "A",
                   "outputs": "O", "exploration": "E"}
+
+
+def _stub(ext: str, header: list[str], body: str) -> str:
+    """Render a script stub with comment syntax the target language accepts.
+
+    A Python triple-quoted docstring is a syntax error in R and in Stata, so
+    the header block cannot be shared verbatim across languages: `.R` uses
+    `#`, `.do` uses `*`, and only `.py` gets a docstring.
+    """
+    if ext == ".py":
+        head = '"""' + "\n".join(header) + '\n"""'
+        return f"{head}\n\n# {body}\n"
+    marker = "*" if ext == ".do" else "#"
+    head = "\n".join(f"{marker} {line}".rstrip() for line in header)
+    return f"{head}\n\n{marker} {body}\n"
 
 
 def _prompt(label: str, default: str | None = None) -> str:
@@ -89,6 +106,10 @@ def init_project(
         "language": language,
         "studies": studies,
         "sources": sources,
+        # Stamped from the installed package so a scaffold can never claim a
+        # version of the architecture other than the one that produced it.
+        "arch_version": __version__,
+        "arch_version_short": ".".join(__version__.split(".")[:2]),
     }
     for tpl_path in template_dir.rglob("*.template"):
         rel = tpl_path.relative_to(template_dir)
@@ -106,13 +127,14 @@ def init_project(
         stub_name = f"L{i:02d}_load_{source}{ext}"
         stub_path = location / "code" / "loading" / stub_name
         stub_path.write_text(
-            f'"""L{i:02d}: Load {source}\n'
-            f'====================\n'
-            f'Phase:   Loading\n'
-            f'Purpose: TODO\n'
-            f'Public Source: TODO\n'
-            f'Units:   TODO\n'
-            f'"""\n\n# TODO: implement loader\n',
+            _stub(ext, [
+                f"L{i:02d}: Load {source}",
+                "====================",
+                "Phase:   Loading",
+                "Purpose: TODO",
+                "Public Source: TODO",
+                "Units:   TODO",
+            ], "TODO: implement loader"),
             encoding="utf-8",
         )
 
@@ -121,12 +143,13 @@ def init_project(
         stub_name = f"A{i:02d}_{study.lower()}{ext}"
         stub_path = location / "code" / "analysis" / stub_name
         stub_path.write_text(
-            f'"""A{i:02d}: {study}\n'
-            f'====================\n'
-            f'Phase:   Analysis\n'
-            f'Purpose: TODO\n'
-            f'Studies: {study}\n'
-            f'"""\n\n# TODO: implement analysis\n',
+            _stub(ext, [
+                f"A{i:02d}: {study}",
+                "====================",
+                "Phase:   Analysis",
+                "Purpose: TODO",
+                f"Studies: {study}",
+            ], "TODO: implement analysis"),
             encoding="utf-8",
         )
 

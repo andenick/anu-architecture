@@ -1,4 +1,5 @@
 """Test anu-architecture init."""
+import json
 import subprocess
 import sys
 
@@ -107,6 +108,78 @@ def test_scaffolded_run_py_lists_each_script_once(tmp_path):
               if ln.startswith("  ") and ln.strip()]
     if "O" in phases:
         assert phases.index("O") == len(phases) - 1, proc.stdout
+
+
+@pytest.mark.parametrize("language,ext,marker", [
+    ("R", ".R", "#"),
+    ("Stata", ".do", "*"),
+])
+def test_non_python_stubs_are_not_python(tmp_path, language, ext, marker):
+    """Regression: the L##/A## stubs were emitted as Python for every
+    language. A `\"\"\"` docstring is a syntax error in R and in Stata, so the
+    first script the scaffolded orchestrator reached aborted the run."""
+    target = tmp_path / f"stub-{language}"
+    result = runner.invoke(app, [
+        "init", f"stub-{language}", "--language", language,
+        "--location", str(target), "--yes",
+    ])
+    assert result.exit_code == 0, result.output
+
+    stubs = [target / "code" / "loading" / f"L01_load_fred{ext}",
+             target / "code" / "analysis" / f"A01_study_01{ext}"]
+    for stub in stubs:
+        assert stub.exists(), stub
+        text = stub.read_text(encoding="utf-8")
+        assert '"""' not in text, text
+        for line in text.splitlines():
+            if line.strip():
+                assert line.startswith(marker), (stub, line)
+    # The audit gate wants a Public Source: header on every L## script.
+    assert "Public Source:" in stubs[0].read_text(encoding="utf-8")
+
+
+def test_scaffold_stamps_the_installed_architecture_version(tmp_path):
+    """The registry used to hardcode `Anu Architecture v2.1`, so every project
+    scaffolded by a later release claimed the wrong architecture version."""
+    from anu_architecture import __version__
+
+    target = tmp_path / "stamp-proj"
+    result = runner.invoke(app, [
+        "init", "stamp-proj", "--language", "Python",
+        "--location", str(target), "--yes",
+    ])
+    assert result.exit_code == 0, result.output
+    registry = json.loads((target / "project_registry.json").read_text(encoding="utf-8"))
+    short = ".".join(__version__.split(".")[:2])
+    assert registry["architecture"] == f"Anu Architecture v{short}"
+
+
+def test_stata_orchestrator_skips_xx00_case_insensitively(tmp_path):
+    """Stata's `dir` extended macro function reports names in whatever case
+    the OS gives it — Windows lower-cases them — so an exact-case comparison
+    against `L00_run_all.do` silently never skips."""
+    target = tmp_path / "stata-skip"
+    runner.invoke(app, [
+        "init", "stata-skip", "--language", "Stata",
+        "--location", str(target), "--yes",
+    ])
+    run_do = (target / "run.do").read_text(encoding="utf-8")
+    assert "strlower(" in run_do, run_do
+    assert '"`f\'" != "`phase\'00_run_all.do"' not in run_do, run_do
+
+
+def test_r_orchestrator_honours_dry_run(tmp_path):
+    """The generated R README advertises `Rscript run.R --dry-run`; run.R
+    used to ignore its arguments and execute the whole pipeline instead."""
+    target = tmp_path / "r-dry"
+    runner.invoke(app, [
+        "init", "r-dry", "--language", "R",
+        "--location", str(target), "--yes",
+    ])
+    run_r = (target / "run.R").read_text(encoding="utf-8")
+    assert "commandArgs(" in run_r, run_r
+    assert "'--dry-run' %in% args" in run_r, run_r
+    assert "if (!dry_run) source(s)" in run_r, run_r
 
 
 def test_init_refuses_existing_non_empty(tmp_path):

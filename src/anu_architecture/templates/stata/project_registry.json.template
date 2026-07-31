@@ -1,7 +1,7 @@
 {
-  "version": "2.1.0",
+  "version": "0.1.0",
   "project": "{{ project_name }}",
-  "architecture": "Anu Architecture v2.1",
+  "architecture": "Anu Architecture v{{ arch_version_short }}",
   "language": "{{ language }}",
   "author": "TODO",
 

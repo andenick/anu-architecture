@@ -12,7 +12,7 @@ work it should not have:
 from pathlib import Path
 
 from anu_architecture.discovery import discover_all, discover_scripts
-from anu_architecture.run import run_pipeline
+from anu_architecture.run import _command_for, _stata_executable, run_pipeline
 
 PHASES = ("setup", "loading", "processing", "validation",
           "manual", "analysis", "outputs", "exploration")
@@ -84,3 +84,17 @@ def test_dry_run_lists_without_executing(tmp_path):
 
 def test_run_rejects_non_project(tmp_path):
     assert run_pipeline(tmp_path) == 1
+
+
+def test_stata_command_uses_an_edition_found_on_path(tmp_path, monkeypatch):
+    """`stata-mp` was hardcoded, so `run` could not drive an SE/BE/IC install
+    even when Stata was installed and on PATH."""
+    monkeypatch.setattr("anu_architecture.run.shutil.which",
+                        lambda name: "/opt/stata/stata-be" if name == "stata-be" else None)
+    assert _stata_executable() == "stata-be"
+    assert _command_for(Path("code/loading/L01_load.do"))[0] == "stata-be"
+
+
+def test_stata_command_falls_back_when_nothing_is_installed(monkeypatch):
+    monkeypatch.setattr("anu_architecture.run.shutil.which", lambda name: None)
+    assert _stata_executable() == "stata-mp"

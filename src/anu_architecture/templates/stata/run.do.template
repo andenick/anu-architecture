@@ -5,9 +5,8 @@
 * The optional XX00_run_all.do in a phase folder is a standalone convenience
 * runner for that one phase; it is skipped here so nothing runs twice.
 *
-* NOTE: the project's CI does not include a Stata runner, so this
-* orchestrator is not exercised automatically. Run it once by hand
-* (stata -b do run.do) before relying on it.
+* NOTE: this project's CI does not include a Stata runner, so nothing
+* re-checks this file automatically after you edit it.
 
 local phases "S L P V M A V O"
 local dirs   "setup loading processing validation manual analysis validation outputs"
@@ -17,11 +16,15 @@ forvalues i = 1/`n' {
     local phase : word `i' of `phases'
     local dir   : word `i' of `dirs'
 
+    * The `dir' extended macro function reports names in the case the OS
+    * gives it (Windows lower-cases them), so the XX00 comparison below has
+    * to be case-insensitive or the skip silently never fires.
     local files : dir "code/`dir'" files "`phase'??_*.do"
     local files : list sort files
+    local skip = strlower("`phase'00_run_all.do")
 
     foreach f of local files {
-        if ("`f'" != "`phase'00_run_all.do") {
+        if (strlower("`f'") != "`skip'") {
             display "`phase'  `f'"
             do "code/`dir'/`f'"
         }

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -17,7 +18,6 @@ def run_pipeline(
     from_phase: str | None = None,
     validate_only: bool = False,
     dry_run: bool = False,
-    series: str | None = None,
 ) -> int:
     project = project.resolve()
     if not (project / "project_registry.json").exists():
@@ -67,11 +67,28 @@ def run_pipeline(
     return 0 if all(e["exit_code"] == 0 for e in log) else 1
 
 
+# Stata ships under a different executable name per edition and platform.
+# Assuming MP silently breaks every SE/BE/IC install, so probe PATH instead.
+STATA_EXECUTABLES = (
+    "stata-mp", "stata-se", "stata-be", "stata",
+    "StataMP-64", "StataSE-64", "StataBE-64", "StataMP", "StataSE", "StataBE",
+)
+
+
+def _stata_executable() -> str:
+    """First Stata console binary found on PATH, whatever the edition."""
+    for candidate in STATA_EXECUTABLES:
+        if shutil.which(candidate):
+            return candidate
+    # Nothing on PATH: name one so the resulting error is legible.
+    return STATA_EXECUTABLES[0]
+
+
 def _command_for(script: Path) -> list[str]:
     if script.suffix == ".py":
         return [sys.executable, str(script)]
     if script.suffix == ".R":
         return ["Rscript", str(script)]
     if script.suffix == ".do":
-        return ["stata-mp", "-b", "do", str(script)]
+        return [_stata_executable(), "-b", "do", str(script)]
     return [str(script)]
