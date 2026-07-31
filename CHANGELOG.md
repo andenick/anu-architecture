@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.2.1 — 2026-07-31
 
 Second correctness pass. The R and Stata scaffolds were run end to end for the
 first time, against real runtimes (R 4.4.1 and Stata 18 BE on Windows); both
