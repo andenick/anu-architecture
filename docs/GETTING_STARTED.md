@@ -34,7 +34,7 @@ The scaffold writes:
 ```
 my-study/
 ├── README.md
-├── run.py                       # Master orchestrator
+├── run.py                       # Master orchestrator (run.R / run.do for R / Stata)
 ├── project_registry.json        # Single source of truth
 ├── DECISION_LOG.md              # Document every design decision
 ├── CHECKLIST.md                 # Auto-populated
@@ -58,8 +58,9 @@ my-study/
 
 ## 3. Add data sources
 
-Edit `code/loading/L01_<source>.py` (a stub was generated). Every L## must
-document its source:
+Edit `code/loading/L01_load_<source>.py` (a stub was generated, with the
+extension your project language implies). Every L## must document its
+source:
 
 ```python
 """

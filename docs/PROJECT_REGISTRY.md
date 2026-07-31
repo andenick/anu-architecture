@@ -5,11 +5,15 @@ the pipeline.
 
 ## Schema (excerpt)
 
+`version` is the *project's* own version — `init` seeds it at `0.1.0` and you
+bump it. `architecture` records which version of the tool scaffolded the
+project and is stamped by `init`; it is not something you maintain by hand.
+
 ```json
 {
-  "version": "2.1.0",
+  "version": "0.1.0",
   "project": "My Banking Study",
-  "architecture": "Anu Architecture v2.1",
+  "architecture": "Anu Architecture v2.2",
   "language": "Python",
   "author": "Alice Researcher",
 
@@ -66,5 +70,6 @@ Every proxy must have a justification. The audit refuses to pass undocumented pr
 ## Updating
 
 `anu-architecture status` reads it; `anu-architecture init` creates it;
-`anu-architecture version up` archives it before bumping the project
-version.
+`anu-architecture version up` copies it into the version snapshot under
+`_archive/`. Nothing rewrites the `version` field for you — bump it yourself
+when you decide the project has moved on.

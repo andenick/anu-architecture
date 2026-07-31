@@ -7,9 +7,11 @@
 
 ---
 
-# Anu Architecture v2.1
+# Anu Architecture
 
 *Lineage: NickyData v1.1 -> AnuData Architecture v2.0 (May 2026) -> Anu Architecture v2.1 (May 2026 — renamed for framework-name consistency).*
+
+*This document specifies the architecture, not a particular release of the tool. For the version you have installed, run `anu-architecture --version`; for what changed between releases, see [`../CHANGELOG.md`](../CHANGELOG.md).*
 
 ## Description
 
@@ -272,13 +274,13 @@ Technical/AnuArchitecture/
 
 ## project_registry.json
 
-Single source of truth for study configuration:
+Single source of truth for study configuration. `version` is the *project's* own version and is yours to bump; `architecture` is stamped by `anu-architecture init` from the version of the tool that scaffolded the project.
 
 ```json
 {
-  "version": "2.1.0",
+  "version": "0.1.0",
   "project": "Project Name",
-  "architecture": "Anu Architecture v2.1",
+  "architecture": "Anu Architecture v2.2",
   "language": "R",
   "author": "Author Name",
 
@@ -389,16 +391,28 @@ When deliverables are ready for the project's root `Outputs/` folder:
 
 ## Master Orchestrator
 
-The master orchestrator (`run.R`, `run.py`, or `run.do`) is the single entry point:
+The master orchestrator (`run.R`, `run.py`, or `run.do`) is the single entry point. The flags a scaffolded orchestrator accepts differ by language — only these exist:
 
 ```
-Rscript run.R                    # Full pipeline: S -> L -> P -> V -> M -> A -> V -> O
-Rscript run.R --setup-only       # Just S##
-Rscript run.R --load-only        # Just L##
-Rscript run.R --from P           # Resume from processing phase
-Rscript run.R --test A01         # Run specific script
-Rscript run.R --dry-run          # Show what would execute
-Rscript run.R --report           # Status report from last run
+# Python (run.py)
+python run.py                    # Full pipeline: S -> L -> P -> V -> M -> A -> V -> O
+python run.py --dry-run          # List what would execute; run nothing
+python run.py --setup-only       # Just S##
+python run.py --validate-only    # Just V##
+python run.py --from P           # Resume from the processing phase onward
+
+# R (run.R)
+Rscript run.R                    # Full pipeline
+Rscript run.R --dry-run          # List what would execute; run nothing
+
+# Stata (run.do)
+stata -b do run.do               # Full pipeline (no flags)
+```
+
+The installed CLI runs the same pipeline language-agnostically, dispatching each script to the interpreter its extension implies:
+
+```
+anu-architecture run [--project PATH] [--dry-run] [--validate-only] [--from P]
 ```
 
 The master orchestrator auto-discovers scripts by glob pattern (e.g., `list.files("code/loading", pattern = "^L[0-9]{2}_.*\\.R$")`) and runs them in numeric order, excluding the optional XX00 per-phase runners so that nothing executes twice.
@@ -510,11 +524,15 @@ Every script execution is logged to `logs/runs/` as structured JSON:
 
 ---
 
-## Versioning
+## Versioning (inside a scaffolded project)
 
-- **No CHANGELOG file** — git tags mark architecture milestones (e.g., `anu-architecture-v2.1`)
+This section is about the research project you scaffold, not about this tool. A scaffolded project does not get a CHANGELOG:
+
+- **No CHANGELOG file in the project** — git tags mark milestones, and Evolutionary Versioning below is the heavier mechanism when a project needs one
 - DECISION_LOG.md tracks project-level decisions
 - Git log is the changelog
+
+The tool itself versions differently: this repository does ship a [`CHANGELOG.md`](../CHANGELOG.md) and tags releases `vX.Y.Z` on `main`.
 
 ---
 
@@ -599,7 +617,6 @@ Every assumption should be revisited when versioning up.
 
 ---
 
-*Anu Architecture v2.1 — Part of the Anu Framework v12.2*
+*Part of the [Anu Framework](https://github.com/andenick/anu-framework); maintained there and released standalone from this repository.*
 *Lineage: NickyData v1.0 (2026-04-05) -> NickyData v1.1 (2026-04-06) -> AnuData v2.0 (2026-05-09) -> Anu Architecture v2.1 (2026-05-15)*
-*Maintained as part of the Anu Framework*
 *First application: an applied research project (2026-04-05)*

@@ -22,7 +22,8 @@ app = typer.Typer(
 
 @app.command()
 def init(
-    name: str = typer.Argument(None, help="Project name (defaults to dir name)"),
+    name: str = typer.Argument(None, help="Project name (prompted if omitted; "
+                                          "default 'anu-project')"),
     language: str = typer.Option(None, "--language", "-l",
                                  help="Python | R | Stata | Mixed"),
     location: Path = typer.Option(None, "--location",
@@ -49,11 +50,10 @@ def run(
     from_phase: str = typer.Option(None, "--from", help="Resume from phase letter"),
     validate_only: bool = typer.Option(False, "--validate-only"),
     dry_run: bool = typer.Option(False, "--dry-run"),
-    series: str = typer.Option(None, "--series", help="Run for specific subset"),
 ) -> None:
     """Run the master orchestrator."""
     run_pipeline(project=project, from_phase=from_phase,
-                 validate_only=validate_only, dry_run=dry_run, series=series)
+                 validate_only=validate_only, dry_run=dry_run)
 
 
 @app.command()

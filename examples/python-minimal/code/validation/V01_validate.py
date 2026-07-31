@@ -27,7 +27,8 @@ with src.open() as f:
 checks["n_years"] = len(years)
 checks["years_monotonic"] = years == sorted(years)
 checks["values_plausible"] = all(0.1 < v < 1000 for v in values)
-checks["status"] = "PASS" if all([checks["years_monotonic"], checks["values_plausible"]]) else "FAIL"
+checks["status"] = "PASS" if all(
+    [checks["years_monotonic"], checks["values_plausible"]]) else "FAIL"
 
 log_path.write_text(json.dumps(checks, indent=2))
 print(f"  V01: {checks['status']}  ({checks['n_years']} years)")
