@@ -53,6 +53,20 @@ def test_missing_public_source_warns_not_fails(tmp_path):
     assert rc_strict == 1
 
 
+def test_l00_run_all_is_exempt_from_the_public_source_rule(tmp_path):
+    """L00_run_all is the per-phase convenience runner, not a loader. Holding
+    it to the Public Source: rule made a freshly scaffolded Python project
+    fail `audit --strict` on a file the scaffold itself had just written."""
+    proj = _make_proj(tmp_path)
+    (proj / "code" / "loading" / "L00_run_all.py").write_text(
+        '"""Run every L01-L99 in this phase."""\n')
+    assert run_audit(proj, strict=True) == 0
+
+    # ...but a real loader with no source header still warns.
+    (proj / "code" / "loading" / "L01_load.py").write_text("import pandas as pd\n")
+    assert run_audit(proj, strict=True) == 1
+
+
 # --- proxy_justification negative control ---------------------------------
 
 def test_proxy_without_justification_warns_and_fails_strict(tmp_path):

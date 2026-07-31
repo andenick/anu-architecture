@@ -3,7 +3,8 @@ r"""Public-reproducibility audit — anu-architecture audit.
 Checks:
     FAIL  - Hardcoded local paths (D:\, /Users/, C:\)
     FAIL  - np.random in S/L/P/V/M scripts (data construction; never in analysis/E paths)
-    WARN  - L## scripts without 'Public Source:' header
+    WARN  - L01-L99 scripts without 'Public Source:' header (L00_run_all is a
+            per-phase convenience runner, not a loader, and is exempt)
     WARN  - 'proxy: true' without proxy_justification
 
 COVERAGE — this gate is not a whole-repo scan. It reads:
@@ -33,7 +34,10 @@ import typer
 HARDCODED_PATH_RE = re.compile(
     r"(?:[A-Z]:[\\/]|/Users/|/home/[a-z]+/)\S"
 )
-LOAD_SCRIPT_RE = re.compile(r"L\d{2}_.*\.(py|R|do)$")
+# L01-L99 only. L00_run_all is the optional per-phase convenience runner: it
+# loads nothing, so demanding a Public Source: header from it made a freshly
+# scaffolded Python project fail `audit --strict` on its own generated file.
+LOAD_SCRIPT_RE = re.compile(r"L(?!00_)\d{2}_.*\.(py|R|do)$")
 PUBLIC_SOURCE_RE = re.compile(r"Public\s+Source\s*:", re.IGNORECASE)
 RANDOM_RE = re.compile(r"\bnp\.random\b|\brandom\.(rand|randint|normal|choice)\b")
 
