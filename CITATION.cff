@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+title: "Anu Architecture: standardized 8-phase econometric project scaffold"
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+authors:
+  - family-names: Anderson
+    given-names: Nicholas
+    email: nickawebbox@gmail.com
+    affiliation: "The New School for Social Research"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"  # Nick to fill
+repository-code: "https://github.com/andenick/anu-architecture"
+abstract: >-
+  A standardized 8-phase architecture (Setup, Load, Process, Validate, Manual,
+  Analyze, Output, Explore) for econometric data construction and analysis. It
+  scaffolds a self-contained, language-agnostic project in which every script,
+  dataset, output, and decision is tracked in one folder, under containment,
+  no-synthetic-data, justified-proxy, reproducibility-without-agents, and
+  audit-trail principles. It is a standalone member skill of the Anu Framework.
+keywords:
+  - econometrics
+  - data-pipeline
+  - reproducible-research
+  - python
+# version:        # tracked via CLI only, no version string in README; Nick to fill
+# date-released:  # no git tag; Nick to fill
+license: MIT
